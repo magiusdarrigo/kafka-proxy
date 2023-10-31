@@ -32,9 +32,8 @@ RUN adduser \
         kafka-proxy
 
 COPY --from=builder /go/src/github.com/grepplabs/kafka-proxy/build /opt/kafka-proxy/bin
-RUN setcap 'cap_net_bind_service=+ep' /opt/kafka-proxy/bin/kafka-proxy
+# RUN setcap 'cap_net_bind_service=+ep' /opt/kafka-proxy/bin/kafka-proxy
 
 USER kafka-proxy
 ENTRYPOINT ["/opt/kafka-proxy/bin/kafka-proxy"]
 CMD ["--help"]
-
