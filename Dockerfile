@@ -19,9 +19,7 @@ COPY . .
 RUN mkdir -p build && \
     export GOARM=$( echo "${GOARM}" | cut -c2-) && \
     go build -mod=vendor -o build/kafka-proxy \
-    -ldflags "${LDFLAGS}" . && \
-    go build -mod=vendor -o build/unsecured-jwt-info \
-    -ldflags "${LDFLAGS}" cmd/plugin-unsecured-jwt-info/main.go
+    -ldflags "${LDFLAGS}" .
 
 FROM --platform=$BUILDPLATFORM alpine:3.17
 RUN apk add --no-cache ca-certificates libcap
@@ -34,7 +32,6 @@ RUN adduser \
         kafka-proxy
 
 COPY --from=builder /go/src/github.com/grepplabs/kafka-proxy/build /opt/kafka-proxy/bin
-RUN setcap 'cap_net_bind_service=+ep' /opt/kafka-proxy/bin/unsecured-jwt-info
 RUN setcap 'cap_net_bind_service=+ep' /opt/kafka-proxy/bin/kafka-proxy
 
 USER kafka-proxy

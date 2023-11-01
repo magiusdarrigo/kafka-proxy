@@ -50,4 +50,3 @@ RUN setcap 'cap_net_bind_service=+ep' /opt/kafka-proxy/bin/kafka-proxy && \
 USER kafka-proxy
 ENTRYPOINT ["/opt/kafka-proxy/bin/kafka-proxy"]
 CMD ["--help"]
-

@@ -12,9 +12,11 @@ import (
 )
 
 const (
-	StatusOK          = 0
-	StatusEncodeError = 1
-	AlgorithmNone     = "none"
+	StatusOK            = 0
+	StatusEncodeError   = 1
+	StatusFileReadError = 2
+	AlgorithmNone       = "none"
+	jwtFilePath         = "/var/run/secrets/tokens/service-token"
 )
 
 type UnsecuredJWTProvider struct {
@@ -22,12 +24,12 @@ type UnsecuredJWTProvider struct {
 }
 
 func (v UnsecuredJWTProvider) GetToken(ctx context.Context, request apis.TokenRequest) (apis.TokenResponse, error) {
-	token, err := v.encodeToken()
+	token, err := os.ReadFile(jwtFilePath)
 	if err != nil {
-		return getGetTokenResponse(StatusEncodeError, "")
+		logrus.Errorf("Error reading JWT from file: %v", err)
+		return getGetTokenResponse(StatusFileReadError, "")
 	}
-
-	return getGetTokenResponse(StatusOK, token)
+	return getGetTokenResponse(StatusOK, string(token))
 }
 
 func getGetTokenResponse(status int, token string) (apis.TokenResponse, error) {
@@ -64,8 +66,7 @@ func main() {
 	_ = flags.Parse(os.Args[1:])
 
 	if pluginMeta.claimSub == "" {
-		logrus.Errorf("parameter claim-sub is required")
-		os.Exit(1)
+		logrus.Infof("parameter claim-sub is not set. But that is okay for this plugin.")
 	}
 
 	unsecuredJWTProvider := &UnsecuredJWTProvider{
