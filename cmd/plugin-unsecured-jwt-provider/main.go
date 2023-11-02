@@ -26,14 +26,14 @@ type UnsecuredJWTProvider struct {
 func (v UnsecuredJWTProvider) GetToken(ctx context.Context, request apis.TokenRequest) (apis.TokenResponse, error) {
 	token, err := os.ReadFile(jwtFilePath)
 	if err != nil {
-		logrus.Errorf("Error reading JWT from file: %v", err)
-		return getGetTokenResponse(StatusFileReadError, "")
+		os.Exit(StatusFileReadError)
 	}
 	return getGetTokenResponse(StatusOK, string(token))
 }
 
 func getGetTokenResponse(status int, token string) (apis.TokenResponse, error) {
 	success := status == StatusOK
+	logrus.Infof("MATTEO DEBUGGING: GetTokenResponse: success=%v, status=%d, token=%s", success, status, token)
 	return apis.TokenResponse{Success: success, Status: int32(status), Token: token}, nil
 }
 

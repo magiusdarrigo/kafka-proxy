@@ -292,6 +292,7 @@ func Run(_ *cobra.Command, _ []string) {
 					logrus.Fatal(err)
 				}
 			} else {
+				logrus.Infof("MATTEO DEBUGGING: Using custom plugin '%s' TokenProvider for sasl authentication", c.Kafka.SASL.Plugin.Command)
 				client := NewPluginClient(tokenprovider.Handshake, tokenprovider.PluginMap, c.Kafka.SASL.Plugin.LogLevel, c.Kafka.SASL.Plugin.Command, c.Kafka.SASL.Plugin.Parameters)
 				defer client.Kill()
 

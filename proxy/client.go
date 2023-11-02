@@ -95,6 +95,7 @@ func NewClient(conns *ConnSet, c *config.Config, netAddressMappingFunc config.Ne
 				readTimeout:   c.Kafka.ReadTimeout,
 				tokenProvider: saslTokenProvider,
 			}
+			logrus.Infof("MATTEO DEBUGGING: SASLAuthByProxy config created")
 		} else {
 			return nil, errors.Errorf("SASLAuthByProxy plugin unsupported or plugin misconfiguration for mechanism '%s' ", c.Kafka.SASL.Plugin.Mechanism)
 		}
@@ -108,6 +109,7 @@ func NewClient(conns *ConnSet, c *config.Config, netAddressMappingFunc config.Ne
 				username:     c.Kafka.SASL.Username,
 				password:     c.Kafka.SASL.Password,
 			}
+			logrus.Infof("MATTEO DEBUGGING: SASLAuthByProxy config set to be in Plain text")
 		} else if c.Kafka.SASL.Method == SASLSCRAM256 || c.Kafka.SASL.Method == SASLSCRAM512 {
 			saslAuthByProxy = &SASLSCRAMAuth{
 				clientID:     c.Kafka.ClientID,
@@ -339,8 +341,10 @@ func (c *Client) auth(conn net.Conn, brokerAddress string) error {
 		}
 	}
 	if c.config.Kafka.SASL.Enable {
+		logrus.Infof("MATTEO DEBUGGING: sendAndReceiveSASLAuth is being called now")
 		err := c.saslAuthByProxy.sendAndReceiveSASLAuth(conn, brokerAddress)
 		if err != nil {
+			logrus.Infof("MATTEO DEBUGGING: sendAndReceiveSASLAuth failed: %v", err)
 			_ = conn.Close()
 			return err
 		}

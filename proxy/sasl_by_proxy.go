@@ -192,8 +192,10 @@ func (b *SASLOAuthBearerAuth) sendAndReceiveSASLAuth(conn DeadlineReaderWriter, 
 
 	token, err := b.getOAuthBearerToken()
 	if err != nil {
+		logrus.Infof("MATTEO DEBUGGING: getOAuthBearerToken() failed. Error: %v", err)
 		return err
 	}
+	logrus.Infof("MATTEO DEBUGGING: getOAuthBearerToken() succeeded. Token: %v", token)
 	saslHandshake := &SASLHandshake{
 		clientID:     b.clientID,
 		version:      1,
@@ -203,6 +205,7 @@ func (b *SASLOAuthBearerAuth) sendAndReceiveSASLAuth(conn DeadlineReaderWriter, 
 	}
 	handshakeErr := saslHandshake.sendAndReceiveHandshake(conn)
 	if handshakeErr != nil {
+		logrus.Infof("MATTEO DEBUGGING: SASL handshake failed. Error: %v", handshakeErr)
 		return handshakeErr
 	}
 	return b.sendSaslAuthenticateRequest(token, conn)
@@ -210,6 +213,7 @@ func (b *SASLOAuthBearerAuth) sendAndReceiveSASLAuth(conn DeadlineReaderWriter, 
 
 func (b *SASLOAuthBearerAuth) sendSaslAuthenticateRequest(token string, conn DeadlineReaderWriter) error {
 	logrus.Debugf("Sending SaslAuthenticateRequest, mechanism OAUTHBEARER")
+	logrus.Infof("MATTEO DEBUGGING: Sending SaslAuthenticateRequest, mechanism OAUTHBEARER")
 
 	saslAuthReqV0 := protocol.SaslAuthenticateRequestV0{SaslAuthBytes: SaslOAuthBearer{}.ToBytes(token, "", make(map[string]string, 0))}
 
@@ -260,5 +264,6 @@ func (b *SASLOAuthBearerAuth) sendSaslAuthenticateRequest(token string, conn Dea
 	if res.Err != protocol.ErrNoError {
 		return errors.Wrapf(res.Err, "SASL authentication failed, error message is '%v'", res.ErrMsg)
 	}
+	logrus.Infof("MATTEO DEBUGGING: No error in SASL auth response. Success? uhhh")
 	return nil
 }
